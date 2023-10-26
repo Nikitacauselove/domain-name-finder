@@ -1,4 +1,4 @@
-package com.example.domainnamefinder.model;
+package com.domainname.finder.model;
 
 import lombok.RequiredArgsConstructor;
 

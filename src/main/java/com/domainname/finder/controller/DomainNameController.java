@@ -1,7 +1,7 @@
-package com.example.domainnamefinder.controller;
+package com.domainname.finder.controller;
 
-import com.example.domainnamefinder.service.DomainNameService;
-import com.example.domainnamefinder.service.FileWriterService;
+import com.domainname.finder.service.DomainNameService;
+import com.domainname.finder.service.FileWriterService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;

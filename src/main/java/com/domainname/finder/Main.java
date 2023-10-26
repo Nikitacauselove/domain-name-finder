@@ -1,6 +1,6 @@
-package com.example.domainnamefinder;
+package com.domainname.finder;
 
-import com.example.domainnamefinder.controller.DomainNameController;
+import com.domainname.finder.controller.DomainNameController;
 import io.javalin.Javalin;
 
 public class Main {

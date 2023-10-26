@@ -1,4 +1,4 @@
-package com.example.domainnamefinder.service;
+package com.domainname.finder.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;

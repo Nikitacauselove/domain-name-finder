@@ -1,6 +1,6 @@
-package com.example.domainnamefinder.service;
+package com.domainname.finder.service;
 
-import com.example.domainnamefinder.model.DomainNameFinder;
+import com.domainname.finder.model.DomainNameFinder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.util.SubnetUtils;
 import org.apache.http.HttpResponseInterceptor;
