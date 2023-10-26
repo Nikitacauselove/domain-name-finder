@@ -37,9 +37,9 @@ public class DomainNameService {
 
         for (String address : allAddresses) {
             String uri = String.format("https://%s", address);
-            DomainNameFinder domainNameFinder = new DomainNameFinder(HTTP_CLIENT, new BasicHttpContext(), new HttpGet(uri));
+            DomainNameFinder finder = new DomainNameFinder(HTTP_CLIENT, new BasicHttpContext(), new HttpGet(uri));
 
-            futureQueue.add(executorService.submit(domainNameFinder));
+            futureQueue.add(executorService.submit(finder));
         }
 
         Map<String, Set<String>> result = new HashMap<>();

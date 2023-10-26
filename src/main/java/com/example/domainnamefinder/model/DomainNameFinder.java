@@ -29,15 +29,14 @@ public class DomainNameFinder implements Callable<Set<String>> {
             httpClient.execute(httpGet, httpContext);
         } catch (ConnectTimeoutException exception) {
             log.info("{}: Поиск завершился из-за слишком долгого времени ожидания отклика.", httpGet.getURI());
+
             return Collections.emptySet();
         }
 
         X509Certificate x509Certificate = (X509Certificate) httpContext.getAttribute(SSL_CERTIFICATE);
 
         try {
-            Collection<List<?>> alternativeNames = x509Certificate.getSubjectAlternativeNames();
-
-            for (List<?> name : alternativeNames) {
+            for (List<?> name : x509Certificate.getSubjectAlternativeNames()) {
                 SanType sanType = SanType.of((int) name.get(0));
 
                 if (sanType == SanType.DNS) {
@@ -46,6 +45,7 @@ public class DomainNameFinder implements Callable<Set<String>> {
             }
         } catch (NullPointerException exception) {
             log.info("{}: Поиск завершился из-за отсутствия SSL-сертификата.", httpGet.getURI());
+
             return Collections.emptySet();
         } catch (Exception exception) {
             String name = x509Certificate.getSubjectX500Principal().getName().split(",")[0];
