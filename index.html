@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Domain name finder</title>
+    <link rel="stylesheet" href="html&css/normalize.css">
+    <link rel="stylesheet" href="html&css/index.css">
+</head>
+<body>
+<iframe name="hidden-frame"></iframe>
+<form action="http://localhost:7070/domain" target="hidden-frame" type="GET">
+    <p>
+        <label for="ip">IP range</label>
+        <input id="ip" name="ip" pattern="^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}/([1-2]?[\d]|3[0-2])$" required title="Диапазон IP-адресов должен иметь вид «192.168.5.0/24»" type="text" value="51.38.24.0/24">
+    </p>
+    <p>
+        <label for="thread">Number of threads</label>
+        <input id="thread" name="thread" pattern="[1-9]|[1-9]\d" required title="Количество потоков должно находиться в диапазоне от 1 до 99 включительно" type="text" value="1">
+    </p>
+    <p>
+        <input type="submit" value="Send">
+    </p>
+</form>
+<script src="html&css/index.js"></script>
+</body>
+</html>
