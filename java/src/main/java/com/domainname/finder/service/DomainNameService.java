@@ -13,6 +13,7 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpCoreContext;
 
 import javax.net.ssl.SSLSession;
+import java.security.cert.Certificate;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -22,18 +23,17 @@ public class DomainNameService {
     private static final HttpResponseInterceptor CERTIFICATE_INTERCEPTOR = (httpResponse, context) -> {
         ManagedHttpClientConnection connection = (ManagedHttpClientConnection) context.getAttribute(HttpCoreContext.HTTP_CONNECTION);
         SSLSession sslSession = connection.getSSLSession();
+        Certificate[] certificates = sslSession == null ? new Certificate[0] : sslSession.getPeerCertificates();
 
-        if (sslSession != null) {
-            context.setAttribute(DomainNameFinder.SSL_CERTIFICATE, sslSession.getPeerCertificates()[0]);
-        }
+        context.setAttribute(DomainNameFinder.SSL_CERTIFICATE, certificates);
     };
     private static final RequestConfig REQUEST_CONFIG = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).build();
     private static final CloseableHttpClient HTTP_CLIENT = HttpClients.custom().addInterceptorFirst(CERTIFICATE_INTERCEPTOR).setDefaultRequestConfig(REQUEST_CONFIG).build();
 
     public static Map<String, Set<String>> findAll(String ip, Integer numberOfThreads) {
-        String[] allAddresses = new SubnetUtils(ip).getInfo().getAllAddresses();
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
         Queue<Future<Set<String>>> futureQueue = new ConcurrentLinkedQueue<>();
+        String[] allAddresses = new SubnetUtils(ip).getInfo().getAllAddresses();
 
         for (String address : allAddresses) {
             String uri = String.format("https://%s", address);
@@ -47,7 +47,7 @@ public class DomainNameService {
             try {
                 result.put(address, futureQueue.poll().get());
             } catch (ExecutionException | InterruptedException exception) {
-                log.info("{}: Поиск доменных имен завершился раньше времени.", address);
+                log.error("{}: Поиск завершился ошибкой: {}", address, exception.getMessage());
             }
         }
         executorService.shutdown();

@@ -25,33 +25,19 @@ public class DomainNameFinder implements Callable<Set<String>> {
         log.info("{}: Начался поиск доменных имен.", httpGet.getURI());
         Set<String> domainNames = new HashSet<>();
 
-        try {
-            httpClient.execute(httpGet, httpContext);
-        } catch (ConnectTimeoutException exception) {
-            log.info("{}: Поиск завершился из-за слишком долгого времени ожидания отклика.", httpGet.getURI());
+        httpClient.execute(httpGet, httpContext);
+        X509Certificate[] x509Certificates = (X509Certificate[]) httpContext.getAttribute(SSL_CERTIFICATE);
 
-            return Collections.emptySet();
-        }
+        for (X509Certificate x509Certificate : x509Certificates) {
+            Collection<List<?>> alternativeNames = x509Certificate.getSubjectAlternativeNames() == null ? Collections.emptyList() : x509Certificate.getSubjectAlternativeNames();
 
-        X509Certificate x509Certificate = (X509Certificate) httpContext.getAttribute(SSL_CERTIFICATE);
-
-        try {
-            for (List<?> name : x509Certificate.getSubjectAlternativeNames()) {
+            for (List<?> name : alternativeNames) {
                 SanType sanType = SanType.of((int) name.get(0));
 
-                if (sanType == SanType.DNS) {
+                if (sanType == SanType.DNS_NAME) {
                     domainNames.add((String) name.get(1));
                 }
             }
-        } catch (NullPointerException exception) {
-            log.info("{}: Поиск завершился из-за отсутствия SSL-сертификата.", httpGet.getURI());
-
-            return Collections.emptySet();
-        } catch (Exception exception) {
-            String name = x509Certificate.getSubjectX500Principal().getName().split(",")[0];
-            String commonName = name.replace("CN=", "");
-
-            domainNames.add(commonName);
         }
 
         log.info("{}: Поиск завершился успешно.", httpGet.getURI());

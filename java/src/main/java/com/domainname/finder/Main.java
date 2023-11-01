@@ -5,7 +5,7 @@ import io.javalin.Javalin;
 
 public class Main {
     public static void main(String[] args) {
-        Javalin.create()
+        Javalin javalin = Javalin.create()
                 .get("/domain", context -> {
                     String ip = context.queryParamAsClass("ip", String.class).get();
                     Integer thread = context.queryParamAsClass("thread", Integer.class).get();

@@ -24,7 +24,7 @@ public class FileWriterService {
         try (Writer fileWriter = new FileWriter(String.format("%s/%s", OUTPUT_DIRECTORY, fileName))) {
             fileWriter.write(OBJECT_WRITER.writeValueAsString(domainNames));
         } catch (IOException exception) {
-            log.info("При попытке записи в файл {} возникла ошибка.", fileName);
+            log.error(String.format("При попытке записи в файл %s возникла ошибка.", fileName), exception);
         }
     }
 }
