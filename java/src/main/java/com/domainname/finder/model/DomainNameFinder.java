@@ -3,7 +3,6 @@ package com.domainname.finder.model;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
 
@@ -14,11 +13,11 @@ import java.util.concurrent.Callable;
 @RequiredArgsConstructor
 @Slf4j
 public class DomainNameFinder implements Callable<Set<String>> {
+    public static final String SSL_CERTIFICATE = "sslCertificate";
+
     private final CloseableHttpClient httpClient;
     private final HttpContext httpContext;
     private final HttpGet httpGet;
-
-    public static final String SSL_CERTIFICATE = "sslCertificate";
 
     @Override
     public Set<String> call() throws Exception {
