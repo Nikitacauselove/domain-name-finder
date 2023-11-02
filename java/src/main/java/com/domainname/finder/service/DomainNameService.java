@@ -19,16 +19,17 @@ import java.util.concurrent.*;
 
 @Slf4j
 public class DomainNameService {
-    private static final int CONNECT_TIMEOUT = 1000;
-    private static final HttpResponseInterceptor CERTIFICATE_INTERCEPTOR = (httpResponse, context) -> {
+    public static final int CONNECT_TIMEOUT = 1000;
+
+    private static final HttpResponseInterceptor certificateInterceptor = (httpResponse, context) -> {
         ManagedHttpClientConnection connection = (ManagedHttpClientConnection) context.getAttribute(HttpCoreContext.HTTP_CONNECTION);
         SSLSession sslSession = connection.getSSLSession();
         Certificate[] certificates = sslSession == null ? new Certificate[0] : sslSession.getPeerCertificates();
 
         context.setAttribute(DomainNameFinder.SSL_CERTIFICATE, certificates);
     };
-    private static final RequestConfig REQUEST_CONFIG = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).build();
-    private static final CloseableHttpClient HTTP_CLIENT = HttpClients.custom().addInterceptorFirst(CERTIFICATE_INTERCEPTOR).setDefaultRequestConfig(REQUEST_CONFIG).build();
+    private static final RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).build();
+    private static final CloseableHttpClient httpClient = HttpClients.custom().addInterceptorFirst(certificateInterceptor).setDefaultRequestConfig(requestConfig).build();
 
     public static Map<String, Set<String>> findAll(String ip, Integer numberOfThreads) {
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
@@ -37,7 +38,7 @@ public class DomainNameService {
 
         for (String address : allAddresses) {
             String uri = String.format("https://%s", address);
-            DomainNameFinder finder = new DomainNameFinder(HTTP_CLIENT, new BasicHttpContext(), new HttpGet(uri));
+            DomainNameFinder finder = new DomainNameFinder(httpClient, new BasicHttpContext(), new HttpGet(uri));
 
             futureQueue.add(executorService.submit(finder));
         }
